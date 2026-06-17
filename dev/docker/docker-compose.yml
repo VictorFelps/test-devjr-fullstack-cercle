@@ -1,0 +1,73 @@
+name: cercle-test-devjr
+
+services:
+  postgres:
+    image: postgres:17.6
+    container_name: cercle-test-devjr-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    environment:
+      TZ: America/Sao_Paulo
+      POSTGRES_DB: cercle_test
+      POSTGRES_USER: cercle_test
+      POSTGRES_PASSWORD: cercle_test
+      PGPORT: 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      cercle-test-network:
+        aliases:
+          - postgres
+
+  migrate-db-postgres:
+    container_name: cercle-test-devjr-migrate-db-postgres
+    image: migrate/migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cercle-test-network
+    volumes:
+      - ../../core/database/postgres/migration:/migration
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    command:
+      - "-path"
+      - "/migration"
+      - "-database"
+      - "postgres://cercle_test:cercle_test@postgres:5432/cercle_test?sslmode=disable&search_path=cercle_test"
+      - "up"
+
+  init-dev-data:
+    container_name: cercle-test-devjr-init-dev-data
+    image: postgres:17.6
+    depends_on:
+      migrate-db-postgres:
+        condition: service_completed_successfully
+    networks:
+      - cercle-test-network
+    volumes:
+      - ../../core/database/postgres/samples:/scripts/samples
+    environment:
+      PGPASSWORD: cercle_test
+    command: >
+      sh -c "
+        echo '🔄 Executing development scripts...' &&
+        psql -h postgres -U cercle_test -d cercle_test -f /scripts/samples/retailer.sql &&
+        psql -h postgres -U cercle_test -d cercle_test -f /scripts/samples/users.sql &&
+        psql -h postgres -U cercle_test -d cercle_test -f /scripts/samples/resale_order.sql &&
+        psql -h postgres -U cercle_test -d cercle_test -f /scripts/samples/resale_order_item.sql &&
+        echo '✅ Development scripts executed!'
+      "
+
+networks:
+  cercle-test-network:

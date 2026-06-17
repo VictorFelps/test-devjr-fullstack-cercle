@@ -1,0 +1,316 @@
+definitions:
+  input.CreateRetailerInputDTO:
+    properties:
+      document_number:
+        type: string
+      name:
+        type: string
+      trade_name:
+        type: string
+    type: object
+  input.UpdateRetailerInputDTO:
+    properties:
+      name:
+        type: string
+      trade_name:
+        type: string
+    type: object
+  output.RetailerOutputDTO:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      document_number:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      trade_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/app/users/{cpf}/orders/{order_id}/items:
+    get:
+      consumes:
+      - application/json
+      description: Returns all items of a specific order identified by user CPF and
+        order ID
+      parameters:
+      - description: User CPF (digits only, 11 characters)
+        in: path
+        name: cpf
+        required: true
+        type: string
+      - description: Order ID (UUID)
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order items retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Order not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List order items by CPF and order ID
+      tags:
+      - Resale
+  /v1/app/users/{cpf}/orders/{order_id}/items/{item_id}/cancel:
+    put:
+      consumes:
+      - application/json
+      description: Cancels a specific item of an order identified by user CPF, order
+        ID and item ID
+      parameters:
+      - description: User CPF (digits only, 11 characters)
+        in: path
+        name: cpf
+        required: true
+        type: string
+      - description: Order ID (UUID)
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: Order Item ID (UUID)
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item cancelled successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Order or item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cancel an order item
+      tags:
+      - Resale
+  /v1/retailer:
+    get:
+      description: Returns all active retailers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Retailers retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/output.RetailerOutputDTO'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List retailers
+      tags:
+      - Retailer
+    post:
+      consumes:
+      - application/json
+      description: Creates a new retailer
+      parameters:
+      - description: Retailer data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/input.CreateRetailerInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Retailer created successfully
+          schema:
+            $ref: '#/definitions/output.RetailerOutputDTO'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a retailer
+      tags:
+      - Retailer
+  /v1/retailer/{id}:
+    delete:
+      description: Soft deletes a retailer by ID
+      parameters:
+      - description: Retailer ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Retailer deleted successfully
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Retailer not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Retailer already deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a retailer
+      tags:
+      - Retailer
+    get:
+      description: Returns a specific retailer by ID
+      parameters:
+      - description: Retailer ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Retailer retrieved successfully
+          schema:
+            $ref: '#/definitions/output.RetailerOutputDTO'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Retailer not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a retailer by ID
+      tags:
+      - Retailer
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing retailer by ID
+      parameters:
+      - description: Retailer ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated retailer data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/input.UpdateRetailerInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Retailer updated successfully
+          schema:
+            $ref: '#/definitions/output.RetailerOutputDTO'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Retailer not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Retailer is deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a retailer
+      tags:
+      - Retailer
+swagger: "2.0"
