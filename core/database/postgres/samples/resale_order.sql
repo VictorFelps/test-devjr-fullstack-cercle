@@ -98,7 +98,7 @@ INSERT INTO cercle_test.resale_order (
     'or_TestJY4I8c6w0AE', -- external_id
     'SHD-2026-00004', -- code
     '2026-06-12 14:05:00', -- date
-    'WAITING_PAYMENT', -- current_status
+    'PAID', -- current_status
     '30140071', -- delivery_address_zip_code
     'Rua Espírito Santo', -- delivery_address_street
     '501', -- delivery_address_number
@@ -107,7 +107,7 @@ INSERT INTO cercle_test.resale_order (
     'MG', -- delivery_address_state
     'BR', -- delivery_address_country
     'Camila Freitas', -- delivery_address_receiver_name
-    'aguardando-pagamento', -- payment_status
+    'pagamento-aprovado', -- payment_status
     '589.50', -- amount_subtotal
     '22.50', -- amount_freight
     '0.00', -- amount_interest
